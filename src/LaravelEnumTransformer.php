@@ -21,7 +21,7 @@ class LaravelEnumTransformer implements Transformer
         return TransformedType::create(
             $class,
             $name,
-            'export enum '. $name . ' {' . PHP_EOL . $this->resolveOptions($class) . PHP_EOL . '}'
+            'export enum ' . $name . ' {' . PHP_EOL . $this->resolveOptions($class) . PHP_EOL . '}'
         );
     }
 
