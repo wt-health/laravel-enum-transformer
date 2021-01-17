@@ -1,6 +1,10 @@
 Laravel Enum Transformer
 ================================
 
+[![CI Action](https://github.com/wt-health/laravel-enum-transformer/workflows/CI/badge.svg)](https://github.com/wt-health/laravel-enum-transformer/actions?query=workflow%3ACI)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/wt-health/laravel-enum-transformer/badges/quality-score.png?b=master&s=05927bab19f5d8f124e2860c16c9e9e129bfe6df)](https://scrutinizer-ci.com/g/wt-health/laravel-enum-transformer/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/wt-health/laravel-enum-transformer/badges/coverage.png?b=master&s=bd88b309a345a8ad847c597e8c72c1916207e713)](https://scrutinizer-ci.com/g/wt-health/laravel-enum-transformer/?branch=master)
+
 Adds transformation support for  [bensampo/laravel-enum](https://github.com/BenSampo/laravel-enum) based enums to the 
 [spatie/laravel-typescript-transformer](https://github.com/spatie/laravel-typescript-transformer) package.
 
