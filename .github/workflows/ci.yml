@@ -13,7 +13,6 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         php: [7.4, 8.0]
-        dependency-version: [prefer-lowest, prefer-stable]
 
     name: P${{ matrix.php }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
 
@@ -35,7 +34,7 @@ jobs:
           coverage: pcov
 
       - name: Install dependencies
-        run: composer install --no-progress --no-suggest  --optimize-autoloader --${{ matrix.dependency-version }}
+        run: composer install --no-progress --no-suggest  --optimize-autoloader --prefer-dist
 
       - name: Coding Standard
         run: composer run esc-check
