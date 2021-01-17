@@ -1,4 +1,4 @@
-name: run-tests
+name: CI
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
           coverage: pcov
 
       - name: Install dependencies
-        run: composer install --no-progress --no-suggest  --optimize-autoloader --prefer-dist
+        run: composer update --no-progress --optimize-autoloader --prefer-dist
 
       - name: Coding Standard
         run: composer run ecs-check
