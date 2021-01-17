@@ -28,11 +28,11 @@ jobs:
           key: dependencies-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
 
       - name: Setup PHP
-          uses: shivammathur/setup-php@v2
-          with:
-            php-version: ${{ matrix.php }}
-            extensions: dom, bcmath, curl, libxml, gettext, exif, iconv, intl, mbstring, gd, imagick, soap, sockets, zip, pcntl, pdo, mysql, pdo_mysql
-            coverage: pcov
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, bcmath, curl, libxml, gettext, exif, iconv, intl, mbstring, gd, imagick, soap, sockets, zip, pcntl, pdo, mysql, pdo_mysql
+          coverage: pcov
 
       - name: Install dependencies
         run: composer install --no-progress --no-suggest  --optimize-autoloader --${{ matrix.dependency-version }}
