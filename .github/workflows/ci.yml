@@ -33,7 +33,7 @@ jobs:
         run: composer install --no-progress --no-suggest  --optimize-autoloader --prefer-dist
 
       - name: Coding Standard
-        run: composer run esc-check
+        run: composer run ecs-check
 
       - name: Run Tests
         run: composer run test
