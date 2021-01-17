@@ -1,0 +1,49 @@
+name: run-tests
+
+on: [push, pull_request]
+
+jobs:
+
+  test:
+    env:
+      SCRUTINIZER_ACCESS_TOKEN: ${{secrets.SCRUTINIZER_ACCESS_TOKEN}}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest]
+        php: [7.4, 8.0]
+        dependency-version: [prefer-lowest, prefer-stable]
+
+    name: P${{ matrix.php }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Cache dependencies
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache/files
+          key: dependencies-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
+
+      - name: Setup PHP
+          uses: shivammathur/setup-php@v2
+          with:
+            php-version: ${{ matrix.php }}
+            extensions: dom, bcmath, curl, libxml, gettext, exif, iconv, intl, mbstring, gd, imagick, soap, sockets, zip, pcntl, pdo, mysql, pdo_mysql
+            coverage: pcov
+
+      - name: Install dependencies
+        run: composer install --no-progress --no-suggest  --optimize-autoloader --${{ matrix.dependency-version }}
+
+      - name: Coding Standard
+        run: composer run esc-check
+
+      - name: Run Tests
+        run: composer run test
+
+      - name: Upload Coverage report
+        run: |
+          curl -L https://scrutinizer-ci.com/ocular.phar > ./ocular.phar
+          php ocular.phar code-coverage:upload --access-token="${SCRUTINIZER_ACCESS_TOKEN}" --format=php-clover ./build/clover.xml
