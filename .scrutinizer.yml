@@ -1,0 +1,26 @@
+checks:
+  php: true
+
+build:
+  environment:
+    php:
+      version: 7.4.0
+  nodes:
+    analysis:
+      cache:
+        directories:
+          - ~/.composer
+      tests:
+        override:
+          - php-scrutinizer-run
+
+build_failure_conditions:
+  - 'elements.rating(<= B).new.exists'
+
+filter:
+  excluded_paths:
+    - tests/
+
+tools:
+  external_code_coverage:
+    timeout: 300 # 5 minutes
