@@ -21,13 +21,13 @@
     "require" : {
         "php" : "^8.0",
         "ext-json": "*",
-        "spatie/typescript-transformer" : "^2.0.0",
-        "bensampo/laravel-enum": "^2.0|^3.0|^4.0"
+        "spatie/typescript-transformer" : "^2.1.0",
+        "bensampo/laravel-enum": "^4.1.0"
     },
     "require-dev" : {
-        "phpunit/phpunit": "^9.5",
-        "spatie/phpunit-snapshot-assertions": "^4.2",
-        "symplify/easy-coding-standard-prefixed": "^9.3"
+        "phpunit/phpunit": "^9.5.10",
+        "spatie/phpunit-snapshot-assertions": "^4.2.9",
+        "symplify/easy-coding-standard": "^9.4"
     },
     "autoload" : {
         "psr-4" : {
