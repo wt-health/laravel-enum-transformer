@@ -35,7 +35,7 @@ jobs:
           COMPOSER_AUTH: ${{secrets.REPMAN_COMPOSER_AUTH}}
       - name: PHP Coding Standards
         run: composer run ecs-check
-      - name: Run Tests
-        run: composer run test --coverage-clover=./coverage.clover -v
+      - name: Run Tests including coverage
+        run: composer run coverage
       - name: Upload Coverage report
         run: vendor/bin/ocular code-coverage:upload --access-token="${SCRUTINIZER_ACCESS_TOKEN}" --format=php-clover ./coverage.clover

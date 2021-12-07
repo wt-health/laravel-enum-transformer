@@ -42,7 +42,8 @@
     "scripts" : {
         "test" : "vendor/bin/phpunit",
         "ecs-check" : "vendor/bin/ecs check",
-        "ecs-fix" : "vendor/bin/ecs check --fix"
+        "ecs-fix" : "vendor/bin/ecs check --fix",
+        "coverage" : "vendor/bin/phpunit --coverage-clover=./coverage.clover -v"
     },
     "config" : {
         "sort-packages" : true
