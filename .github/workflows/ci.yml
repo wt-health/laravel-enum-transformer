@@ -1,44 +1,41 @@
 name: CI
-
 on:
   push:
     branches:
       - master
   pull_request:
-
 jobs:
-
   test:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
     env:
       SCRUTINIZER_ACCESS_TOKEN: ${{secrets.SCRUTINIZER_ACCESS_TOKEN}}
-    runs-on: ubuntu-latest
+      COMPOSER_AUTH: ${{secrets.REPMAN_COMPOSER_AUTH}}
     steps:
       - name: Checkout code
         uses: actions/checkout@v1
-
-      - name: Cache dependencies
-        uses: actions/cache@v1
-        with:
-          path: ~/.composer/cache/files
-          key: composer-${{ hashFiles('composer.json') }}
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: 8.0
           extensions: dom, bcmath, curl, libxml, gettext, exif, iconv, intl, mbstring, gd, imagick, soap, sockets, zip, pcntl, pdo, mysql, pdo_mysql
           coverage: pcov
-
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
       - name: Install dependencies
-        run: composer update --no-progress --optimize-autoloader --prefer-dist
-
-      - name: Coding Standard
+        run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+        env:
+          COMPOSER_AUTH: ${{secrets.REPMAN_COMPOSER_AUTH}}
+      - name: PHP Coding Standards
         run: composer run ecs-check
-
-      - name: Run Tests
-        run: composer run test
-
+      - name: Run Tests including coverage
+        run: composer run coverage
       - name: Upload Coverage report
-        run: |
-          curl -L https://scrutinizer-ci.com/ocular.phar > ./ocular.phar
-          php ocular.phar code-coverage:upload --access-token="${SCRUTINIZER_ACCESS_TOKEN}" --format=php-clover ./build/clover.xml
+        run: vendor/bin/ocular code-coverage:upload --access-token="${SCRUTINIZER_ACCESS_TOKEN}" --format=php-clover ./coverage.clover
