@@ -8,6 +8,7 @@ use BenSampo\Enum\Enum;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Spatie\Snapshots\MatchesSnapshots;
+use Spatie\TypeScriptTransformer\TypeScriptTransformerConfig;
 use Webtools\LaravelEnumTransformer\LaravelEnumTransformer;
 
 class LaravelEnumTransformerTest extends TestCase
@@ -24,7 +25,9 @@ class LaravelEnumTransformerTest extends TestCase
         $noEnum = new class() {
         };
 
-        $transformer = new LaravelEnumTransformer();
+        $config = TypeScriptTransformerConfig::create();
+
+        $transformer = new LaravelEnumTransformer($config);
 
         $this->assertTrue($transformer->canTransform(new ReflectionClass($enum)));
         $this->assertFalse($transformer->canTransform(new ReflectionClass($noEnum)));
@@ -38,7 +41,9 @@ class LaravelEnumTransformerTest extends TestCase
             public const STRING_USER = 'foobar';
         };
 
-        $transformer = new LaravelEnumTransformer();
+        $config = TypeScriptTransformerConfig::create();
+
+        $transformer = new LaravelEnumTransformer($config->transformToNativeEnums(true));
 
         $type = $transformer->transform(new ReflectionClass($enum), 'Enum');
 
