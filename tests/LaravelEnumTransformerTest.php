@@ -33,7 +33,25 @@ class LaravelEnumTransformerTest extends TestCase
         $this->assertFalse($transformer->canTransform(new ReflectionClass($noEnum)));
     }
 
-    public function test_it_can_transform_an_enum()
+    public function test_it_can_transform_an_enum_to_type()
+    {
+        $enum = new class('foobar') extends Enum {
+            public const ADMIN = 10;
+            public const USER = 20;
+            public const STRING_USER = 'foobar';
+        };
+
+        $config = TypeScriptTransformerConfig::create();
+
+        $transformer = new LaravelEnumTransformer($config);
+
+        $type = $transformer->transform(new ReflectionClass($enum), 'Enum');
+
+        $this->assertMatchesSnapshot($type->transformed);
+        $this->assertTrue($type->missingSymbols->isEmpty());
+    }
+
+    public function test_it_can_transform_an_enum_to_js_enum()
     {
         $enum = new class('foobar') extends Enum {
             public const ADMIN = 10;
