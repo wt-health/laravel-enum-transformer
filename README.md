@@ -39,7 +39,22 @@ final class UserType extends Enum
 }
 ```
 
-```typescript
+```typescript type
+export type UserType = {
+    Administrator = 0,
+    Moderator = 1,
+    Subscriber = 2,
+    SuperAdministrator = 3,
+}
+```
+
+Or transform to enums: 
+
+This must be enabled in `config/type-script-transformer`
+
+`'transform_to_native_enums' => true,`
+
+```typescript enum
 export enum UserType {
     Administrator = 0,
     Moderator = 1,
