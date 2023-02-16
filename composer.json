@@ -22,7 +22,7 @@
         "php" : "^8.0",
         "ext-json": "*",
         "spatie/typescript-transformer" : "^2.1.3",
-        "bensampo/laravel-enum": "^5.0"
+        "bensampo/laravel-enum": "^5.0 || ^6.0"
     },
     "require-dev" : {
         "phpunit/phpunit": "^9.5.10",
