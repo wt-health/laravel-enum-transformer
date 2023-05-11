@@ -29,8 +29,8 @@ class LaravelEnumTransformerTest extends TestCase
 
         $transformer = new LaravelEnumTransformer($config);
 
-        $this->assertTrue($transformer->canTransform(new ReflectionClass($enum)));
-        $this->assertFalse($transformer->canTransform(new ReflectionClass($noEnum)));
+        $this->assertNotNull($transformer->transform(new ReflectionClass($enum)));
+        $this->assertNull($transformer->transform(new ReflectionClass($noEnum)));
     }
 
     public function test_it_can_transform_an_enum_to_type()
