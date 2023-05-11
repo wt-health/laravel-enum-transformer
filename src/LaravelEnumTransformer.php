@@ -16,13 +16,12 @@ class LaravelEnumTransformer implements Transformer
     {
     }
     
-    public function canTransform(ReflectionClass $class): bool
-    {
-        return $class->isSubclassOf(Enum::class);
-    }
-
     public function transform(ReflectionClass $class, string $name): TransformedType
     {
+        if ($class->isSubclassOf(Enum::class) === false) {
+            return null;   
+        }
+        
         return $this->config->shouldTransformToNativeEnums()
             ? $this->toEnum($class, $name)
             : $this->toType($class, $name);
