@@ -16,7 +16,7 @@ class LaravelEnumTransformer implements Transformer
     {
     }
     
-    public function transform(ReflectionClass $class, string $name): TransformedType
+    public function transform(ReflectionClass $class, string $name): ?TransformedType
     {
         if ($class->isSubclassOf(Enum::class) === false) {
             return null;   
