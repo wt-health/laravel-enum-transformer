@@ -72,6 +72,7 @@ class TransformCommandTest extends TestCase
 
         $this->assertSame(<<<'TS'
             export type MixedValues = 10 | 20 | "foobar";
+            export type OverriddenHooks = "VISIBLE";
             export type Priority = 0 | 10 | 20;
             export type Roles = "Master" | "Admin" | "User";
 

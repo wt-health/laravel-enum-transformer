@@ -21,7 +21,9 @@ use Webtools\LaravelEnumTransformer\Tests\Fixtures\Enums\AbstractEnum;
 use Webtools\LaravelEnumTransformer\Tests\Fixtures\Enums\MixedValues;
 use Webtools\LaravelEnumTransformer\Tests\Fixtures\Enums\NativeStatus;
 use Webtools\LaravelEnumTransformer\Tests\Fixtures\Enums\NotAnEnum;
+use Webtools\LaravelEnumTransformer\Tests\Fixtures\Enums\OverriddenHooks;
 use Webtools\LaravelEnumTransformer\Tests\Fixtures\Enums\Priority;
+use Webtools\LaravelEnumTransformer\Tests\Fixtures\Enums\UnsupportedValues;
 
 class LaravelEnumTransformerTest extends TestCase
 {
@@ -116,6 +118,7 @@ class LaravelEnumTransformerTest extends TestCase
         yield 'plain class' => [NotAnEnum::class];
         yield 'abstract bensampo enum' => [AbstractEnum::class];
         yield 'native php enum' => [NativeStatus::class];
+        yield 'values typescript cannot represent' => [UnsupportedValues::class];
     }
 
     /**
@@ -133,6 +136,16 @@ class LaravelEnumTransformerTest extends TestCase
 
             $this->assertInstanceOf(Untransformable::class, $transformed);
         }
+    }
+
+    #[Test]
+    public function it_reads_enums_through_the_get_keys_and_get_value_hooks_like_1x(): void
+    {
+        $this->assertSame(<<<'TS'
+            export enum OverriddenHooks {
+              VISIBLE = "VISIBLE",
+            }
+            TS, $this->write(new LaravelEnumTransformer(useUnionEnums: false), PhpClassNode::fromClassString(OverriddenHooks::class)));
     }
 
     #[Test]

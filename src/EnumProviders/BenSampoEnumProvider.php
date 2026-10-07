@@ -62,12 +62,21 @@ class BenSampoEnumProvider implements EnumProvider
             /** @var class-string<Enum<mixed>> $enum */
             $enum = $phpClassNode->getName();
 
-            // Same source as 1.x, so enums overriding getConstants() keep working.
-            return $enum::asArray();
+            // Read through getKeys()/getValue() exactly like 1.x, so enums overriding any of
+            // getKeys(), getValue() or getConstants() keep generating the same output.
+            $constants = [];
+
+            foreach ($enum::getKeys() as $key) {
+                $constants[$key] = $enum::getValue($key);
+            }
+
+            return $constants;
         }
 
-        // In watch mode classes are reflected statically (roave/better-reflection) so that
-        // edits are picked up without re-loading the class, read the constants from the source.
+        // In watch mode classes are reflected statically (roave/better-reflection), because PHP
+        // can't re-load an edited class in the same process, so the constants are read from the
+        // source. Overrides of getKeys()/getValue()/getConstants() can't run here; they apply
+        // again on the next full `typescript:transform` run.
         return array_map(
             fn (RoaveReflectionClassConstant $constant): mixed => $constant->getValue(),
             $phpClassNode->reflection->getConstants(),
