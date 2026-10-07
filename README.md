@@ -103,7 +103,7 @@ Things to be aware of:
   are skipped, and `#[Spatie\TypeScriptTransformer\Attributes\Hidden]` excludes an enum.
 * The command is still `php artisan typescript:transform`. It also has a new `--watch` mode, which this transformer supports.
   In watch mode PHP can't re-load an edited class, so enum constants are read from the source file: overrides of `getKeys()`, `getValue()` or `getConstants()` aren't applied to watch updates, only to full `typescript:transform` runs.
-* Enums with values TypeScript can't represent (anything other than strings and integers, e.g. `bool`, `null`, arrays) are skipped in both union and native mode instead of generating invalid TypeScript.
+* Enums with values TypeScript can't represent are skipped in both union and native mode, instead of generating invalid TypeScript or aborting the transform: anything other than strings and integers (e.g. `bool`, `null`, arrays), strings that aren't valid UTF-8, and integers outside JavaScript's safe range (±2^53 - 1).
 * The output directory must exist before the command runs.
 
 Usage

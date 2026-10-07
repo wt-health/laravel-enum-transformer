@@ -18,11 +18,13 @@ use Webtools\LaravelEnumTransformer\EnumProviders\BenSampoEnumProvider;
 use Webtools\LaravelEnumTransformer\LaravelEnumTransformer;
 use Webtools\LaravelEnumTransformer\Tests\Fixtures\Boilerplate\Enums\Roles;
 use Webtools\LaravelEnumTransformer\Tests\Fixtures\Enums\AbstractEnum;
+use Webtools\LaravelEnumTransformer\Tests\Fixtures\Enums\MalformedUtf8;
 use Webtools\LaravelEnumTransformer\Tests\Fixtures\Enums\MixedValues;
 use Webtools\LaravelEnumTransformer\Tests\Fixtures\Enums\NativeStatus;
 use Webtools\LaravelEnumTransformer\Tests\Fixtures\Enums\NotAnEnum;
 use Webtools\LaravelEnumTransformer\Tests\Fixtures\Enums\OverriddenHooks;
 use Webtools\LaravelEnumTransformer\Tests\Fixtures\Enums\Priority;
+use Webtools\LaravelEnumTransformer\Tests\Fixtures\Enums\UnsafeInteger;
 use Webtools\LaravelEnumTransformer\Tests\Fixtures\Enums\UnsupportedValues;
 
 class LaravelEnumTransformerTest extends TestCase
@@ -119,6 +121,8 @@ class LaravelEnumTransformerTest extends TestCase
         yield 'abstract bensampo enum' => [AbstractEnum::class];
         yield 'native php enum' => [NativeStatus::class];
         yield 'values typescript cannot represent' => [UnsupportedValues::class];
+        yield 'integer outside javascript safe range' => [UnsafeInteger::class];
+        yield 'malformed utf-8 string' => [MalformedUtf8::class];
     }
 
     /**
@@ -141,15 +145,17 @@ class LaravelEnumTransformerTest extends TestCase
     #[Test]
     public function the_provider_skips_unsupported_values_with_spaties_enum_transformer_too(): void
     {
-        foreach ([true, false] as $useUnionEnums) {
-            $transformer = new EnumTransformer($useUnionEnums, new BenSampoEnumProvider);
+        foreach ([UnsupportedValues::class, UnsafeInteger::class, MalformedUtf8::class] as $class) {
+            foreach ([true, false] as $useUnionEnums) {
+                $transformer = new EnumTransformer($useUnionEnums, new BenSampoEnumProvider);
 
-            $transformed = $transformer->transform(
-                $node = PhpClassNode::fromClassString(UnsupportedValues::class),
-                TransformationContext::createFromPhpClass($node),
-            );
+                $transformed = $transformer->transform(
+                    $node = PhpClassNode::fromClassString($class),
+                    TransformationContext::createFromPhpClass($node),
+                );
 
-            $this->assertInstanceOf(Untransformable::class, $transformed);
+                $this->assertInstanceOf(Untransformable::class, $transformed, $class);
+            }
         }
     }
 

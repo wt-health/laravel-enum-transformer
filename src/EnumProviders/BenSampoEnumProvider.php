@@ -19,6 +19,9 @@ use Spatie\TypeScriptTransformer\Transformers\EnumProviders\EnumProvider;
  */
 class BenSampoEnumProvider implements EnumProvider
 {
+    /** JavaScript's Number.MAX_SAFE_INTEGER */
+    private const MAX_SAFE_INTEGER = 9007199254740991;
+
     public function isEnum(PhpClassNode $phpClassNode): bool
     {
         if ($phpClassNode->isAbstract() || $phpClassNode->isInterface()) {
@@ -51,7 +54,7 @@ class BenSampoEnumProvider implements EnumProvider
             // no cases for anything else (bool, null, arrays), so every EnumTransformer using this
             // provider, including Spatie's own in native mode, skips the enum instead of writing
             // invalid or misleading TypeScript.
-            if (! is_int($value) && ! is_string($value)) {
+            if (! $this->isRepresentable($value)) {
                 return [];
             }
 
@@ -59,6 +62,19 @@ class BenSampoEnumProvider implements EnumProvider
         }
 
         return $cases;
+    }
+
+    /**
+     * Strings must be valid UTF-8 (otherwise JSON encoding the output fails and aborts the whole
+     * transform), and integers must fit JavaScript's safe range (otherwise they're rounded).
+     */
+    protected function isRepresentable(mixed $value): bool
+    {
+        return match (true) {
+            is_string($value) => mb_check_encoding($value, 'UTF-8'),
+            is_int($value) => abs($value) <= self::MAX_SAFE_INTEGER,
+            default => false,
+        };
     }
 
     /**
