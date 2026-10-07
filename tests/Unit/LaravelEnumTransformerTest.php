@@ -139,6 +139,21 @@ class LaravelEnumTransformerTest extends TestCase
     }
 
     #[Test]
+    public function the_provider_skips_unsupported_values_with_spaties_enum_transformer_too(): void
+    {
+        foreach ([true, false] as $useUnionEnums) {
+            $transformer = new EnumTransformer($useUnionEnums, new BenSampoEnumProvider);
+
+            $transformed = $transformer->transform(
+                $node = PhpClassNode::fromClassString(UnsupportedValues::class),
+                TransformationContext::createFromPhpClass($node),
+            );
+
+            $this->assertInstanceOf(Untransformable::class, $transformed);
+        }
+    }
+
+    #[Test]
     public function it_reads_enums_through_the_get_keys_and_get_value_hooks_like_1x(): void
     {
         $this->assertSame(<<<'TS'

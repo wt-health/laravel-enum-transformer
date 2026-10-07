@@ -47,6 +47,14 @@ class BenSampoEnumProvider implements EnumProvider
         $cases = [];
 
         foreach ($this->resolveConstants($phpClassNode) as $name => $value) {
+            // TypeScript enum members and literal unions can only hold numbers and strings. Resolve
+            // no cases for anything else (bool, null, arrays), so every EnumTransformer using this
+            // provider, including Spatie's own in native mode, skips the enum instead of writing
+            // invalid or misleading TypeScript.
+            if (! is_int($value) && ! is_string($value)) {
+                return [];
+            }
+
             $cases[] = ['name' => (string) $name, 'value' => $value];
         }
 
