@@ -6,36 +6,51 @@ on:
   pull_request:
 jobs:
   test:
+    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} - ${{ matrix.stability }}
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.4']
+        laravel: ['12.*', '13.*']
+        stability: [prefer-lowest, prefer-stable]
+        include:
+          - laravel: '12.*'
+            testbench: '10.*'
+          - laravel: '13.*'
+            testbench: '11.*'
     env:
-      SCRUTINIZER_ACCESS_TOKEN: ${{secrets.SCRUTINIZER_ACCESS_TOKEN}}
-      COMPOSER_AUTH: ${{secrets.REPMAN_COMPOSER_AUTH}}
+      COMPOSER_AUTH: ${{ secrets.REPMAN_COMPOSER_AUTH }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v5
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
-          extensions: dom, bcmath, curl, libxml, gettext, exif, iconv, intl, mbstring, gd, imagick, soap, sockets, zip, pcntl, pdo, mysql, pdo_mysql
-          coverage: pcov
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip
+          coverage: none
+          tools: composer:v2
       - name: Get composer cache directory
         id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
+          key: ${{ runner.os }}-php-${{ matrix.php }}-laravel-${{ matrix.laravel }}-${{ matrix.stability }}-composer-${{ hashFiles('composer.json') }}
+          restore-keys: ${{ runner.os }}-php-${{ matrix.php }}-laravel-${{ matrix.laravel }}-${{ matrix.stability }}-composer-
       - name: Install dependencies
-        run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
-        env:
-          COMPOSER_AUTH: ${{secrets.REPMAN_COMPOSER_AUTH}}
-      - name: PHP Coding Standards
-        run: composer run ecs-check
-      - name: Run Tests including coverage
-        run: composer run coverage
-      - name: Upload Coverage report
-        run: vendor/bin/ocular code-coverage:upload --access-token="${SCRUTINIZER_ACCESS_TOKEN}" --format=php-clover ./coverage.clover
+        run: |
+          composer require "illuminate/support:${{ matrix.laravel }}" --no-interaction --no-update
+          composer require "orchestra/testbench:${{ matrix.testbench }}" --dev --no-interaction --no-update
+          composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+      - name: Code style
+        if: matrix.stability == 'prefer-stable'
+        run: composer lint
+      - name: Static analysis
+        if: matrix.stability == 'prefer-stable'
+        run: composer analyse
+      - name: Tests
+        run: composer test

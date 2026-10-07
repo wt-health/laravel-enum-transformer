@@ -4,7 +4,7 @@ checks:
 build:
   environment:
     php:
-      version: 8.0
+      version: 8.4
   nodes:
     analysis:
       cache:
@@ -20,7 +20,3 @@ build_failure_conditions:
 filter:
   excluded_paths:
     - tests/
-
-tools:
-  external_code_coverage:
-    timeout: 300 # 5 minutes
