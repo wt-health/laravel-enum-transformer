@@ -20,6 +20,15 @@ jobs:
             testbench: '10.*'
           - laravel: '13.*'
             testbench: '11.*'
+          # Support floor (php ^8.3) without expanding the full matrix
+          - php: '8.3'
+            laravel: '12.*'
+            testbench: '10.*'
+            stability: prefer-lowest
+          - php: '8.3'
+            laravel: '12.*'
+            testbench: '10.*'
+            stability: prefer-stable
     env:
       COMPOSER_AUTH: ${{ secrets.REPMAN_COMPOSER_AUTH }}
     steps:
